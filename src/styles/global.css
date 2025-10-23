@@ -152,23 +152,27 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Form Styles */
 .form-group {
-  margin-bottom: 25px;
+  display: flex;
+  max-width: 500px;
+  margin: 0 auto;
+  gap: 15px;
+  align-items: center;
 }
 
 .form-group input {
-  width: 100%;
+  flex: 1;
   padding: 15px 25px;
-  border: 2px solid var(--primary-color);
+  border: none;
   border-radius: 50px;
   font-size: 16px;
   outline: none;
-  transition: all 0.3s ease;
-  background: white;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-group input:focus {
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 0 3px rgba(83, 52, 131, 0.1);
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
 }
 
 .form-row {

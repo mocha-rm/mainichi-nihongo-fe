@@ -181,7 +181,7 @@ const HomePage: React.FC = () => {
           <p style={{ fontSize: '18px', marginBottom: '20px' }}>무료로 매일 아침 새로운 일본어를 받아보세요</p>
           
           <form onSubmit={handleSubmit}>
-            <div className="form-row">
+            <div className="form-group">
               <input 
                 type="email" 
                 name="email" 
