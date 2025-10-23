@@ -42,3 +42,7 @@ export interface AlertMessage {
   type: 'success' | 'error'
   message: string
 }
+
+export interface SubscriberResponseDto {
+  email: string
+}
