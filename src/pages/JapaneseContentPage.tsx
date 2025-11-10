@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface ContentData {
@@ -9,10 +9,68 @@ interface ContentData {
   content: string;
 }
 
+// 날짜 유틸리티 함수들
+const formatDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const parseDate = (dateString: string): Date | null => {
+  // YYYY-MM-DD 형식 파싱
+  const parts = dateString.split('-');
+  if (parts.length !== 3) return null;
+  
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10) - 1; // 월은 0부터 시작
+  const day = parseInt(parts[2], 10);
+  
+  const date = new Date(year, month, day);
+  if (isNaN(date.getTime())) return null;
+  
+  return date;
+};
+
+const getPreviousDate = (dateString: string): string | null => {
+  const date = parseDate(dateString);
+  if (!date) return null;
+  
+  date.setDate(date.getDate() - 1);
+  return formatDate(date);
+};
+
+const getNextDate = (dateString: string): string | null => {
+  const date = parseDate(dateString);
+  if (!date) return null;
+  
+  date.setDate(date.getDate() + 1);
+  return formatDate(date);
+};
+
 const JapaneseContentPage: React.FC = () => {
   const [data, setData] = useState<ContentData | null>(null);
   const [error, setError] = useState<string>('');
   const { date } = useParams<{ date: string }>();
+  const navigate = useNavigate();
+  
+  // 이전/다음 날짜 계산
+  const prevDate = date ? getPreviousDate(date) : null;
+  const nextDate = date ? getNextDate(date) : null;
+  
+  const handlePrevClick = () => {
+    if (prevDate) {
+      window.scrollTo(0, 0); // 페이지 상단으로 스크롤
+      navigate(`/contents/${prevDate}`);
+    }
+  };
+  
+  const handleNextClick = () => {
+    if (nextDate) {
+      window.scrollTo(0, 0); // 페이지 상단으로 스크롤
+      navigate(`/contents/${nextDate}`);
+    }
+  };
 
   useEffect(() => {
     if (!date) {
@@ -100,6 +158,31 @@ const JapaneseContentPage: React.FC = () => {
       {/* 메인 콘텐츠 */}
       <div className="main-content">
         <div dangerouslySetInnerHTML={{ __html: data.content }} />
+      </div>
+
+      {/* 네비게이션 버튼 */}
+      <div className="content-navigation">
+        <button
+          onClick={handlePrevClick}
+          disabled={!prevDate}
+          className={`nav-button nav-button-prev ${!prevDate ? 'disabled' : ''}`}
+          style={prevDate && nextDate ? { flex: '1' } : {}}
+        >
+          <span>◀</span>
+          <span>이전 글</span>
+          {prevDate && <span className="nav-date">({prevDate})</span>}
+        </button>
+        
+        <button
+          onClick={handleNextClick}
+          disabled={!nextDate}
+          className={`nav-button nav-button-next ${!nextDate ? 'disabled' : ''}`}
+          style={prevDate && nextDate ? { flex: '1' } : {}}
+        >
+          {nextDate && <span className="nav-date">({nextDate})</span>}
+          <span>다음 글</span>
+          <span>▶</span>
+        </button>
       </div>
 
       {/* 푸터 */}
