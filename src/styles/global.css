@@ -412,3 +412,82 @@ h1, h2, h3, h4, h5, h6 {
 .fade-in {
   animation: fadeIn 0.5s ease;
 }
+
+/* Content Navigation Styles */
+.content-navigation {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 40px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.nav-button {
+  min-width: 150px;
+  padding: 15px 25px;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Gaegu', cursive;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.nav-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.nav-button-prev {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 5px 15px rgba(15, 52, 96, 0.3);
+}
+
+.nav-button-prev:not(:disabled):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(15, 52, 96, 0.4);
+}
+
+.nav-button-next {
+  background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+  box-shadow: 0 5px 15px rgba(233, 69, 96, 0.3);
+}
+
+.nav-button-next:not(:disabled):hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(233, 69, 96, 0.4);
+}
+
+.nav-button:disabled,
+.nav-button.disabled {
+  background: rgba(128, 128, 128, 0.3) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.nav-date {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Responsive Design for Navigation */
+@media (max-width: 768px) {
+  .content-navigation {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .nav-button {
+    width: 100%;
+    min-width: unset;
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}
