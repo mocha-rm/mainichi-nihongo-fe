@@ -14,28 +14,27 @@ const formatDate = (date: Date): string => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return `${year}${month}${day}`;
 };
 
 const parseDate = (dateString: string): Date | null => {
-  // YYYY-MM-DD 형식 파싱
-  const parts = dateString.split('-');
-  if (parts.length !== 3) return null;
-  
-  const year = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // 월은 0부터 시작
-  const day = parseInt(parts[2], 10);
-  
+  // YYYYMMDD 형식 파싱
+  if (dateString.length !== 8) return null;
+
+  const year = parseInt(dateString.substring(0, 4), 10);
+  const month = parseInt(dateString.substring(4, 6), 10) - 1; // 월은 0부터 시작
+  const day = parseInt(dateString.substring(6, 8), 10);
+
   const date = new Date(year, month, day);
   if (isNaN(date.getTime())) return null;
-  
+
   return date;
 };
 
 const getPreviousDate = (dateString: string): string | null => {
   const date = parseDate(dateString);
   if (!date) return null;
-  
+
   date.setDate(date.getDate() - 1);
   return formatDate(date);
 };
@@ -43,7 +42,7 @@ const getPreviousDate = (dateString: string): string | null => {
 const getNextDate = (dateString: string): string | null => {
   const date = parseDate(dateString);
   if (!date) return null;
-  
+
   date.setDate(date.getDate() + 1);
   return formatDate(date);
 };
@@ -53,18 +52,18 @@ const JapaneseContentPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-  
+
   // 이전/다음 날짜 계산
   const prevDate = date ? getPreviousDate(date) : null;
   const nextDate = date ? getNextDate(date) : null;
-  
+
   const handlePrevClick = () => {
     if (prevDate) {
       window.scrollTo(0, 0); // 페이지 상단으로 스크롤
       navigate(`/contents/${prevDate}`);
     }
   };
-  
+
   const handleNextClick = () => {
     if (nextDate) {
       window.scrollTo(0, 0); // 페이지 상단으로 스크롤
@@ -172,7 +171,7 @@ const JapaneseContentPage: React.FC = () => {
           <span>이전 글</span>
           {prevDate && <span className="nav-date">({prevDate})</span>}
         </button>
-        
+
         <button
           onClick={handleNextClick}
           disabled={!nextDate}

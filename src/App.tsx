@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage'
 import JapaneseContentPage from './pages/JapaneseContentPage'
 import UnsubscribePage from './pages/UnsubscribePage'
 import Layout from './components/Layout'
+import ContentListPage from './pages/ContentListPage'
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/contents/:date" element={<JapaneseContentPage />} />
+        <Route path="/contents" element={<ContentListPage />} />
         <Route path="/unsubscribe" element={<UnsubscribePage />} />
       </Routes>
     </Layout>
