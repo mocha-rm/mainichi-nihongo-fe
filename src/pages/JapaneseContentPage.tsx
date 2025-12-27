@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 interface ContentData {
   date: string;
@@ -18,23 +20,18 @@ const formatDate = (date: Date): string => {
 };
 
 const parseDate = (dateString: string): Date | null => {
-  // YYYYMMDD 형식 파싱
   if (dateString.length !== 8) return null;
-
   const year = parseInt(dateString.substring(0, 4), 10);
-  const month = parseInt(dateString.substring(4, 6), 10) - 1; // 월은 0부터 시작
+  const month = parseInt(dateString.substring(4, 6), 10) - 1;
   const day = parseInt(dateString.substring(6, 8), 10);
-
   const date = new Date(year, month, day);
   if (isNaN(date.getTime())) return null;
-
   return date;
 };
 
 const getPreviousDate = (dateString: string): string | null => {
   const date = parseDate(dateString);
   if (!date) return null;
-
   date.setDate(date.getDate() - 1);
   return formatDate(date);
 };
@@ -42,7 +39,6 @@ const getPreviousDate = (dateString: string): string | null => {
 const getNextDate = (dateString: string): string | null => {
   const date = parseDate(dateString);
   if (!date) return null;
-
   date.setDate(date.getDate() + 1);
   return formatDate(date);
 };
@@ -53,20 +49,50 @@ const JapaneseContentPage: React.FC = () => {
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
 
-  // 이전/다음 날짜 계산
+  // Glass Mixin
+  const glassStyle = {
+    background: 'rgba(255, 255, 255, 0.65)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.4)',
+    borderRadius: '24px',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+    padding: '40px',
+    marginBottom: '40px'
+  };
+
+  const navBtnStyle = (disabled: boolean) => ({
+    background: disabled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.4)',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.2)',
+    borderRadius: '16px',
+    padding: '15px 25px',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    opacity: disabled ? 0.5 : 1,
+    color: '#2d3436',
+    fontWeight: 600,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    transition: 'all 0.2s',
+    flex: 1,
+    justifyContent: 'center',
+    boxShadow: disabled ? 'none' : '0 4px 15px rgba(0,0,0,0.05)'
+  });
+
   const prevDate = date ? getPreviousDate(date) : null;
   const nextDate = date ? getNextDate(date) : null;
 
   const handlePrevClick = () => {
     if (prevDate) {
-      window.scrollTo(0, 0); // 페이지 상단으로 스크롤
+      window.scrollTo(0, 0);
       navigate(`/contents/${prevDate}`);
     }
   };
 
   const handleNextClick = () => {
     if (nextDate) {
-      window.scrollTo(0, 0); // 페이지 상단으로 스크롤
+      window.scrollTo(0, 0);
       navigate(`/contents/${nextDate}`);
     }
   };
@@ -91,17 +117,14 @@ const JapaneseContentPage: React.FC = () => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        // date, level, topic 추출: 헤더 내 .content-info strong 들
         const strongs = doc.querySelectorAll('.content-info strong');
         const parsedDate = strongs.item(0)?.textContent?.trim() || '';
         const parsedLevel = strongs.item(1)?.textContent?.trim() || '';
         const parsedTopic = strongs.item(2)?.textContent?.trim() || '';
 
-        // 콘텐츠 추출: .main-content > div 내부 HTML
         const mainDiv = doc.querySelector('.main-content > div');
         const rawContent = mainDiv ? (mainDiv as HTMLElement).innerHTML : '';
 
-        // TTS 버튼 onclick → data-text 로 변환 (React에서 이벤트 위임으로 처리)
         const contentWithTTSTransform = rawContent.replace(
           /<button class\s*=\s*['"]?tts-button['"]?\s*onclick=[^>]+>(.*?)<\/button>/g,
           (match: string, icon: string) => {
@@ -123,7 +146,6 @@ const JapaneseContentPage: React.FC = () => {
       .catch(() => setError('콘텐츠를 불러오지 못했습니다.'));
   }, [date]);
 
-  // TTS 버튼 처리 (이벤트 위임)
   useEffect(() => {
     const ttsHandler = (e: any) => {
       const target = e.target as HTMLElement;
@@ -138,63 +160,100 @@ const JapaneseContentPage: React.FC = () => {
     return () => document.removeEventListener('click', ttsHandler);
   }, []);
 
-  if (error) return <div style={{ padding: 40, textAlign: 'center' }}>{error}</div>;
-  if (!data) return <div style={{ padding: 40, textAlign: 'center' }}>불러오는 중...</div>;
+  if (error) return <div style={{ padding: 40, textAlign: 'center', color: '#636e72' }}>{error}</div>;
+  if (!data) return <div style={{ padding: 40, textAlign: 'center', color: '#636e72' }}>강의 불러오는 중...</div>;
 
   return (
-    <div className="container">
-      {/* 헤더 */}
-      <div className="header">
-        <h1>🌸 오늘의 일본어 🌸</h1>
-        <p>매일 새로운 일본어와 만나는 시간!</p>
-        <div className="content-info" style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '15px', borderRadius: 15, color: 'white', backdropFilter: 'blur(10px)' }}>
-          <p style={{ margin: 0, fontSize: 18 }}>
-            📅 <strong>{data.date}</strong> | 📚 <strong>{data.level}</strong> 레벨 | 🎯 <strong>{data.topic}</strong> 주제
-          </p>
+    <>
+      <Header title="오늘의 일본어" showTags={false} />
+
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+
+        {/* Info Card - Glass */}
+        <div style={{
+          ...glassStyle,
+          padding: '20px',
+          marginBottom: '30px',
+          background: 'rgba(255, 255, 255, 0.4)',
+          textAlign: 'center',
+          display: 'flex',
+          justifyContent: 'center',
+          gap: '20px',
+          flexWrap: 'wrap'
+        }}>
+          <span style={{ fontSize: '1.1rem', color: '#2d3436' }}>📅 <strong>{data.date}</strong></span>
+          <span style={{ fontSize: '1.1rem', color: '#6c5ce7' }}>📚 <strong>{data.level}</strong> 레벨</span>
+          <span style={{ fontSize: '1.1rem', color: '#e84393' }}>🎯 <strong>{data.topic}</strong> 주제</span>
         </div>
+
+        {/* Main Content - High Readability Glass */}
+        <div className="main-content" style={{
+          ...glassStyle,
+          lineHeight: 1.8,
+          fontSize: '1.1rem',
+          color: '#2d3436'
+        }}>
+          <div dangerouslySetInnerHTML={{ __html: data.content }} className="lesson-content" />
+        </div>
+
+        {/* 네비게이션 버튼 */}
+        <div className="content-navigation" style={{ display: 'flex', gap: '20px', marginBottom: '60px' }}>
+          <button
+            onClick={handlePrevClick}
+            disabled={!prevDate}
+            style={navBtnStyle(!prevDate)}
+            onMouseEnter={(e) => !(!prevDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.6)')}
+            onMouseLeave={(e) => !(!prevDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.4)')}
+          >
+            <span>◀</span>
+            <span>이전 글</span>
+          </button>
+
+          <button
+            onClick={handleNextClick}
+            disabled={!nextDate}
+            style={navBtnStyle(!nextDate)}
+            onMouseEnter={(e) => !(!nextDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.6)')}
+            onMouseLeave={(e) => !(!nextDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.4)')}
+          >
+            <span>다음 글</span>
+            <span>▶</span>
+          </button>
+        </div>
+
       </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className="main-content">
-        <div dangerouslySetInnerHTML={{ __html: data.content }} />
-      </div>
+      <Footer />
 
-      {/* 네비게이션 버튼 */}
-      <div className="content-navigation">
-        <button
-          onClick={handlePrevClick}
-          disabled={!prevDate}
-          className={`nav-button nav-button-prev ${!prevDate ? 'disabled' : ''}`}
-          style={prevDate && nextDate ? { flex: '1' } : {}}
-        >
-          <span>◀</span>
-          <span>이전 글</span>
-          {prevDate && <span className="nav-date">({prevDate})</span>}
-        </button>
-
-        <button
-          onClick={handleNextClick}
-          disabled={!nextDate}
-          className={`nav-button nav-button-next ${!nextDate ? 'disabled' : ''}`}
-          style={prevDate && nextDate ? { flex: '1' } : {}}
-        >
-          {nextDate && <span className="nav-date">({nextDate})</span>}
-          <span>다음 글</span>
-          <span>▶</span>
-        </button>
-      </div>
-
-      {/* 푸터 */}
-      <div className="footer">
-        <p>
-          <a href="/">메인 페이지로 돌아가기</a> |
-          <a href="/unsubscribe">구독 취소하기</a>
-        </p>
-        <p style={{ marginTop: 10, fontSize: 14, opacity: 0.7 }}>
-          © 2025 마이니치 니홍고. 매일 새로운 일본어와 함께하세요.
-        </p>
-      </div>
-    </div>
+      <style>{`
+        .lesson-content h2 {
+            border-bottom: 2px solid rgba(108, 92, 231, 0.3);
+            padding-bottom: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            color: #2d3436;
+        }
+        .lesson-content p {
+            margin-bottom: 20px;
+        }
+        .tts-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 5px;
+            transition: transform 0.2s;
+        }
+        .tts-button:hover {
+            transform: scale(1.2);
+        }
+        .highlight {
+            background: rgba(253, 203, 110, 0.3);
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+      `}</style>
+    </>
   );
 };
 
