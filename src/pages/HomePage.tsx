@@ -5,12 +5,24 @@ import Alert from '../components/Alert'
 import JapaneseText from '../components/JapaneseText'
 import { AlertMessage, SubscriptionFormData } from '../types'
 import { subscribe, getSubscribers } from '../utils/subscribeApi'
+import { useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
   const [alert, setAlert] = useState<AlertMessage | null>(null)
   const [formData, setFormData] = useState<SubscriptionFormData>({ email: '' })
   const [subscriberCount, setSubscriberCount] = useState<number>(0)
   const [isLoadingSubscribers, setIsLoadingSubscribers] = useState<boolean>(true)
+
+  // Glass Mixin
+  const glassStyle = {
+    background: 'rgba(255, 255, 255, 0.25)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.18)',
+    borderRadius: '24px',
+    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+  };
 
   // 구독자 수 조회
   const fetchSubscribers = async () => {
@@ -20,7 +32,6 @@ const HomePage: React.FC = () => {
       setSubscriberCount(subscribers.length)
     } catch (error) {
       console.error('구독자 수 조회 실패:', error)
-      // 에러가 발생해도 기본값 0으로 설정
       setSubscriberCount(0)
     } finally {
       setIsLoadingSubscribers(false)
@@ -50,7 +61,6 @@ const HomePage: React.FC = () => {
         message: message
       })
       setFormData({ email: '' })
-      // 구독 성공 후 구독자 수 갱신
       await fetchSubscribers()
     } catch (error) {
       setAlert({
@@ -70,11 +80,19 @@ const HomePage: React.FC = () => {
     setActiveTab(tabName)
   }
 
+  const featureCardStyle = {
+    ...glassStyle,
+    padding: '30px',
+    textAlign: 'center' as const,
+    color: '#2d3436',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  }
+
   return (
     <>
       <Header
-        title="🌸 마이니치 니홍고 🌸"
-        subtitle="매일 새로운 일본어와 만나는 시간!"
+        title="마이니치 니홍고"
+        subtitle="매일 만나는 일본어"
         showTags={true}
       />
 
@@ -84,120 +102,73 @@ const HomePage: React.FC = () => {
         {/* 소개 섹션 */}
         <div className="intro-section text-center mb-30">
           <h2 style={{
-            color: 'var(--primary-color)',
-            fontSize: '36px',
+            fontSize: '3rem',
             marginBottom: '20px',
-            background: 'linear-gradient(45deg, var(--primary-color), var(--secondary-color))',
+            fontFamily: "'Gaegu', cursive",
+            background: 'linear-gradient(120deg, #6c5ce7, #a29bfe)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            textShadow: '2px 2px 4px rgba(0,0,0,0.1)'
           }}>
             일본어 학습의 새로운 경험
           </h2>
-          <p style={{ fontSize: '18px', marginBottom: '15px' }}>
+          <p style={{ fontSize: '1.2rem', marginBottom: '10px', color: '#636e72' }}>
             매일 아침, 여러분의 이메일로 전해지는 특별한 일본어 레슨
           </p>
-          <p style={{ fontSize: '18px', marginBottom: '15px' }}>
-            단순한 단어 암기가 아닌, 살아있는 일본 문화와 함께하는 진짜 일본어를 만나보세요
-          </p>
-          <p style={{ fontSize: '18px', marginBottom: '15px' }}>
-            오사카 방언부터 도쿄 표준어까지, 다양한 일본어의 매력을 발견할 수 있습니다
+          <p style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#b2bec3' }}>
+            단순한 암기가 아닌, 살아있는 일본 문화와 함께하는 진짜 일본어를 만나보세요
           </p>
         </div>
 
         {/* 특징 섹션 */}
         <div className="features" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '25px',
-          margin: '40px 0'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '30px',
+          margin: '60px 0'
         }}>
-          <div className="feature" style={{
-            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-            padding: '30px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            color: 'white',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <h3 style={{ fontFamily: 'Gaegu, cursive', fontSize: '24px', marginBottom: '15px' }}>
-              📅 매일 새로운 콘텐츠
-            </h3>
-            <p style={{ fontSize: '16px', opacity: 0.9, lineHeight: 1.6 }}>
-              매일 다른 주제로 구성된 흥미로운 일본어 학습 콘텐츠를 받아보세요
-            </p>
-          </div>
-
-          <div className="feature" style={{
-            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-            padding: '30px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            color: 'white',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <h3 style={{ fontFamily: 'Gaegu, cursive', fontSize: '24px', marginBottom: '15px' }}>
-              🏛️ 문화와 함께
-            </h3>
-            <p style={{ fontSize: '16px', opacity: 0.9, lineHeight: 1.6 }}>
-              언어뿐만 아니라 일본의 문화, 관습, 생활까지 함께 배울 수 있어요
-            </p>
-          </div>
-
-          <div className="feature" style={{
-            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-            padding: '30px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            color: 'white',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <h3 style={{ fontFamily: 'Gaegu, cursive', fontSize: '24px', marginBottom: '15px' }}>
-              🗣️ 실용적인 표현
-            </h3>
-            <p style={{ fontSize: '16px', opacity: 0.9, lineHeight: 1.6 }}>
-              교과서에서 배울 수 없는 실제 일본인들이 사용하는 생생한 표현들
-            </p>
-          </div>
-
-          <div className="feature" style={{
-            background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-            padding: '30px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            color: 'white',
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <h3 style={{ fontFamily: 'Gaegu, cursive', fontSize: '24px', marginBottom: '15px' }}>
-              📍 지역별 방언
-            </h3>
-            <p style={{ fontSize: '16px', opacity: 0.9, lineHeight: 1.6 }}>
-              오사카, 교토, 히로시마 등 다양한 지역의 독특한 방언도 만나보세요
-            </p>
-          </div>
+          {[
+            { icon: '📅', title: '매일 새로운 콘텐츠', desc: '매일 다른 주제의 흥미로운 콘텐츠를 제공합니다.' },
+            { icon: '🏛️', title: '문화와 함께', desc: '언어뿐만 아니라 일본의 문화와 관습도 배웁니다.' },
+            { icon: '🗣️', title: '실전 표현', desc: '교과서에 없는, 실제 원어민이 쓰는 표현.' },
+            { icon: '📍', title: '지역별 방언', desc: '오사카, 교토 등 다양한 지역 방언 탐구.' }
+          ].map((feature, idx) => (
+            <div key={idx} className="feature" style={featureCardStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-5px)';
+                e.currentTarget.style.boxShadow = '0 20px 40px 0 rgba(31, 38, 135, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.07)';
+              }}
+            >
+              <h3 style={{ fontFamily: 'Gaegu', fontSize: '1.5rem', marginBottom: '15px', color: '#2d3436' }}>
+                <span style={{ fontSize: '2rem', display: 'block', marginBottom: '10px' }}>{feature.icon}</span>
+                {feature.title}
+              </h3>
+              <p style={{ fontSize: '1rem', opacity: 0.8, lineHeight: 1.6, color: '#636e72' }}>
+                {feature.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* 구독 폼 */}
+        {/* 구독 폼 - Glassmorphism */}
         <div className="subscription-form" style={{
-          background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%)',
-          padding: '40px',
-          borderRadius: '30px',
+          ...glassStyle,
+          background: 'rgba(255, 255, 255, 0.35)',
+          padding: '50px',
           textAlign: 'center',
-          color: 'white',
-          margin: '30px 0',
-          border: '1px solid rgba(255,255,255,0.1)'
+          margin: '50px 0'
         }}>
-          <h3 style={{ fontFamily: 'Gaegu, cursive', fontSize: '32px', marginBottom: '15px', textShadow: '1px 1px 2px rgba(0,0,0,0.3)' }}>
+          <h3 style={{ fontFamily: 'Gaegu', fontSize: '2.5rem', marginBottom: '20px', color: '#2d3436' }}>
             🎯 지금 바로 시작하세요!
           </h3>
-          <p style={{ fontSize: '18px', marginBottom: '20px' }}>무료로 매일 아침 새로운 일본어를 받아보세요</p>
+          <p style={{ fontSize: '1.2rem', marginBottom: '30px', color: '#636e72' }}>무료로 매일 아침 새로운 일본어를 받아보세요.</p>
 
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
+          <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '0 auto' }}>
+            <div className="form-group" style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
               <input
                 type="email"
                 name="email"
@@ -205,31 +176,70 @@ const HomePage: React.FC = () => {
                 required
                 value={formData.email}
                 onChange={handleInputChange}
+                style={{
+                  padding: '15px 25px',
+                  borderRadius: '50px',
+                  border: '1px solid rgba(255,255,255,0.6)',
+                  background: 'rgba(255,255,255,0.8)',
+                  fontSize: '1rem',
+                  flex: 1,
+                  outline: 'none',
+                  boxShadow: 'inset 0 2px 5px rgba(0,0,0,0.05)'
+                }}
               />
-              <button type="submit" className="btn">구독하기</button>
+              <button type="submit"
+                style={{
+                  padding: '15px 30px',
+                  borderRadius: '50px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
+                  color: 'white',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 5px 15px rgba(108, 92, 231, 0.4)',
+                  transition: 'all 0.3s',
+                  minWidth: '100px'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                구독하기
+              </button>
             </div>
           </form>
 
           <div className="stats" style={{
-            background: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            padding: '25px',
-            borderRadius: '20px',
-            textAlign: 'center',
-            marginTop: '25px',
-            border: '1px solid rgba(255, 255, 255, 0.2)'
+            marginTop: '30px',
+            color: '#636e72'
           }}>
-            <p style={{ margin: 0, fontSize: '20px', fontWeight: 500, fontFamily: 'Gaegu, cursive' }}>
-              🌟 현재 <strong>{isLoadingSubscribers ? '...' : subscriberCount}</strong>명이 함께 학습하고 있어요!
+            <p style={{ margin: 0, fontSize: '1.1rem', fontWeight: 500 }}>
+              🌟 현재 <strong>{isLoadingSubscribers ? '...' : subscriberCount}</strong>명이 함께 학습하고 있습니다!
             </p>
           </div>
         </div>
 
-        {/* 샘플 콘텐츠 미리보기 */}
-        <div style={{ background: '#f8f9fa', padding: '30px', borderRadius: '15px', marginTop: '30px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h3 style={{ color: '#333', margin: 0 }}>📖 콘텐츠 미리보기</h3>
-            <a href="/contents" className="btn" style={{ fontSize: '14px', padding: '8px 20px', textDecoration: 'none' }}>전체 보기 &rarr;</a>
+        {/* 샘플 콘텐츠 미리보기 - Glassmorphism */}
+        <div style={{ ...glassStyle, padding: '40px', marginTop: '40px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+            <h3 style={{ color: '#2d3436', margin: 0, fontSize: '1.8rem', fontFamily: 'Gaegu' }}>📖 콘텐츠 미리보기</h3>
+            <button
+              onClick={() => navigate('/contents')}
+              style={{
+                padding: '10px 25px',
+                borderRadius: '30px',
+                border: '1px solid rgba(108, 92, 231, 0.3)',
+                background: 'rgba(108, 92, 231, 0.1)',
+                color: '#6c5ce7',
+                cursor: 'pointer',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(108, 92, 231, 0.2)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)'}
+            >
+              전체 보기 &rarr;
+            </button>
           </div>
 
           {/* 콘텐츠 탭 메뉴 */}
@@ -237,190 +247,62 @@ const HomePage: React.FC = () => {
             display: 'flex',
             justifyContent: 'center',
             gap: '15px',
-            marginBottom: '25px',
+            marginBottom: '35px',
             flexWrap: 'wrap'
           }}>
-            <button
-              className={`content-tab ${activeTab === 'words' ? 'active' : ''}`}
-              onClick={() => handleTabClick('words')}
-            >
-              📝 핵심 단어
-            </button>
-            <button
-              className={`content-tab ${activeTab === 'conversation' ? 'active' : ''}`}
-              onClick={() => handleTabClick('conversation')}
-            >
-              💬 실전 회화
-            </button>
-            <button
-              className={`content-tab ${activeTab === 'culture' ? 'active' : ''}`}
-              onClick={() => handleTabClick('culture')}
-            >
-              🎭 일본 문화
-            </button>
-            <button
-              className={`content-tab ${activeTab === 'dialect' ? 'active' : ''}`}
-              onClick={() => handleTabClick('dialect')}
-            >
-              🗾 방언 탐방
-            </button>
+            {[['words', '핵심 단어'], ['conversation', '실전 회화'], ['culture', '일본 문화'], ['dialect', '방언 탐방']].map(([key, label]) => (
+              <button
+                key={key}
+                onClick={() => handleTabClick(key)}
+                style={{
+                  padding: '10px 25px',
+                  borderRadius: '30px',
+                  border: 'none',
+                  background: activeTab === key ? 'white' : 'rgba(255,255,255,0.4)',
+                  color: activeTab === key ? '#6c5ce7' : '#636e72',
+                  fontWeight: activeTab === key ? 700 : 500,
+                  cursor: 'pointer',
+                  boxShadow: activeTab === key ? '0 5px 15px rgba(0,0,0,0.05)' : 'none',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
-          {/* 핵심 단어 섹션 */}
-          {activeTab === 'words' && (
-            <div className="content-section active fade-in">
-              <div style={{ background: '#f8f9fa', border: '2px solid #0f3460', borderRadius: '12px', padding: '20px' }}>
-                <h3 style={{ color: '#0f3460', margin: '0 0 15px 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{
-                    background: '#0f3460',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '25px',
-                    height: '25px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '10px',
-                    fontSize: '14px'
-                  }}>📝</span>
-                  오늘의 핵심 단어
-                </h3>
-                <div style={{ display: 'grid', gap: '15px' }}>
-                  <div className="card">
-                    <strong className="japanese-text">
-                      <JapaneseText text="一期一会 (いちごいちえ)" size="large" />
-                    </strong>
-                    <div style={{ color: '#666', fontSize: '16px', marginBottom: '10px', fontStyle: 'italic' }}>
-                      이치고이치에
-                    </div>
-                    <div style={{ color: 'var(--accent-color)', fontWeight: 500, fontSize: '18px', marginBottom: '15px' }}>
-                      일생에 한 번뿐인 만남
-                    </div>
-                    <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '2px solid #eee', fontSize: '16px', color: '#666', lineHeight: 1.6 }}>
-                      일본 다도(茶道)에서 유래한 말로, 모든 만남을 소중히 여기는 마음을 담고 있어요.
-                    </div>
-                  </div>
-
-                  <div className="card">
-                    <strong className="japanese-text">
-                      <JapaneseText text="木漏れ日 (こもれび)" size="large" />
-                    </strong>
-                    <div style={{ color: '#666', fontSize: '16px', marginBottom: '10px', fontStyle: 'italic' }}>
-                      코모레비
-                    </div>
-                    <div style={{ color: 'var(--accent-color)', fontWeight: 500, fontSize: '18px', marginBottom: '15px' }}>
-                      나뭇잎 사이로 비치는 햇살
-                    </div>
-                    <div style={{ marginTop: '15px', paddingTop: '15px', borderTop: '2px solid #eee', fontSize: '16px', color: '#666', lineHeight: 1.6 }}>
-                      일본의 아름다운 자연을 표현하는 대표적인 단어 중 하나예요.
-                    </div>
-                  </div>
-                </div>
+          {/* 탭 컨텐츠 영역 */}
+          <div style={{ background: 'rgba(255,255,255,0.6)', borderRadius: '20px', padding: '30px', border: '1px solid rgba(255,255,255,0.4)' }}>
+            {activeTab === 'words' && (
+              <div>
+                <h4 style={{ color: '#2d3436', marginBottom: '15px' }}>📝 오늘의 핵심 단어</h4>
+                <JapaneseText text="一期一会 (いちごいちえ)" size="large" />
+                <p style={{ color: '#636e72', marginTop: '10px' }}>일생에 한 번뿐인 만남; 이 순간은 다시 오지 않으니 소중히 하라는 뜻.</p>
               </div>
-            </div>
-          )}
-
-          {/* 실전 회화 섹션 */}
-          {activeTab === 'conversation' && (
-            <div className="content-section active fade-in">
-              <div style={{ background: '#f0f8ff', border: '2px solid #4a90e2', borderRadius: '12px', padding: '20px' }}>
-                <h3 style={{ color: '#4a90e2', margin: '0 0 15px 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{
-                    background: '#4a90e2',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '25px',
-                    height: '25px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '10px',
-                    fontSize: '14px'
-                  }}>💬</span>
-                  바로 써먹는 실전 회화
-                </h3>
-                <div style={{ background: 'white', padding: '15px', borderRadius: '8px', marginBottom: '10px', borderLeft: '4px solid #4a90e2' }}>
-                  <p style={{ margin: '0 0 5px 0', fontSize: '16px', color: '#333' }}>
-                    <strong>상황:</strong> 퇴근 시간, 동료와 헤어질 때
-                  </p>
-                  <p style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#2c3e50' }}>
-                    <strong>일본어:</strong> <JapaneseText text="おつかれさま。また明日！" size="large" />
-                  </p>
-                  <p style={{ margin: '0 0 5px 0', fontStyle: 'italic', color: '#7f8c8d' }}>
-                    <strong>발음:</strong> Otsukaresama. Mata ashita!
-                  </p>
-                  <p style={{ margin: 0, color: '#e74c3c', fontWeight: 500 }}>
-                    <strong>한국어:</strong> 수고하셨어요. 내일 봐요!
-                  </p>
-                </div>
+            )}
+            {activeTab === 'conversation' && (
+              <div>
+                <h4 style={{ color: '#2d3436', marginBottom: '15px' }}>💬 바로 써먹는 회화</h4>
+                <JapaneseText text="おつかれさま。また明日！" size="large" />
+                <p style={{ color: '#636e72', marginTop: '10px' }}>수고하셨어요. 내일 봐요!</p>
               </div>
-            </div>
-          )}
-
-          {/* 일본 문화 섹션 */}
-          {activeTab === 'culture' && (
-            <div className="content-section active fade-in">
-              <div style={{ background: '#f0fff4', border: '2px solid #52c41a', borderRadius: '12px', padding: '20px' }}>
-                <h3 style={{ color: '#52c41a', margin: '0 0 15px 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{
-                    background: '#52c41a',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '25px',
-                    height: '25px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '10px',
-                    fontSize: '14px'
-                  }}>🎭</span>
-                  오늘의 일본 문화 TMI
-                </h3>
-                <div style={{ background: 'white', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #52c41a' }}>
-                  <p style={{ margin: 0, lineHeight: 1.6, color: '#333' }}>
-                    'おつかれさま'는 단순한 인사말이 아닌, 일본 직장 문화의 핵심을 보여주는 표현입니다.
-                    상대방의 노력과 수고를 인정하고 존중하는 마음을 담고 있어요.
-                    특히 일본에서는 퇴근할 때 이 말을 하지 않으면 예의가 없다고 여겨질 정도로 중요한 표현이랍니다.
-                  </p>
-                </div>
+            )}
+            {activeTab === 'culture' && (
+              <div>
+                <h4 style={{ color: '#2d3436', marginBottom: '15px' }}>🎭 알쓸신잡 일본 문화</h4>
+                <p style={{ color: '#636e72', lineHeight: 1.6 }}>
+                  '오츠카레사마'는 일본 직장 예절의 핵심으로, 상대방의 노고를 인정하고 존중하는 의미를 담고 있습니다.
+                </p>
               </div>
-            </div>
-          )}
-
-          {/* 방언 탐방 섹션 */}
-          {activeTab === 'dialect' && (
-            <div className="content-section active fade-in">
-              <div style={{ background: '#fff0f6', border: '2px solid #eb2f96', borderRadius: '12px', padding: '20px' }}>
-                <h3 style={{ color: '#eb2f96', margin: '0 0 15px 0', display: 'flex', alignItems: 'center' }}>
-                  <span style={{
-                    background: '#eb2f96',
-                    color: 'white',
-                    borderRadius: '50%',
-                    width: '25px',
-                    height: '25px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginRight: '10px',
-                    fontSize: '14px'
-                  }}>🗾</span>
-                  오늘의 방언 탐방
-                </h3>
-                <div style={{ background: 'white', padding: '15px', borderRadius: '8px', borderLeft: '4px solid #eb2f96' }}>
-                  <p style={{ margin: '0 0 8px 0', color: '#eb2f96', fontWeight: 600 }}>🏮 지역: 오사카</p>
-                  <p style={{ margin: '0 0 5px 0', fontSize: '16px' }}>
-                    <strong>방언:</strong> <JapaneseText text="おつかれやん (Otsukarey-an)" size="large" />
-                  </p>
-                  <p style={{ margin: '0 0 5px 0', color: '#666' }}>
-                    <strong>표준어:</strong> おつかれさま (Otsukaresama)
-                  </p>
-                  <p style={{ margin: 0, color: '#333' }}>
-                    <strong>의미:</strong> 수고하셨어요 (오사카식)
-                  </p>
-                </div>
+            )}
+            {activeTab === 'dialect' && (
+              <div>
+                <h4 style={{ color: '#2d3436', marginBottom: '15px' }}>🗾 오사카 방언</h4>
+                <JapaneseText text="おつかれやん (Otsukarey-an)" size="large" />
+                <p style={{ color: '#636e72', marginTop: '10px' }}>표준어: おつかれさま (수고했어)</p>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
