@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
         <span onClick={() => navigate('/unsubscribe')} style={{ cursor: 'pointer' }}>구독 취소</span>
       </div>
       <p style={{ margin: 0, opacity: 0.8 }}>
-        © 2025 마이니치 니홍고. 매일 새로운 일본어와 함께하세요.
+        © 2026 마이니치 니홍고. 매일 새로운 일본어와 함께하세요.
       </p>
     </footer>
   )
