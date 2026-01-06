@@ -1,4 +1,7 @@
+/* src/components/Layout.tsx */
 import React from 'react'
+import Header from './Header'
+import Footer from './Footer'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -8,20 +11,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)',
-      fontFamily: "'Noto Sans KR', sans-serif",
-      color: '#2d3436'
+      display: 'flex',
+      flexDirection: 'column',
+      /* 배경은 global.css의 body에서 처리하므로 여기서 중복 제거 가능하지만,
+         오버레이 효과를 위해 남겨둔다면 아래처럼 유지 */
     }}>
-      <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.4)', // Overlay to soften
-        minHeight: '100vh',
-        backdropFilter: 'blur(50px)', // Heavy blur for smooth background
-        WebkitBackdropFilter: 'blur(50px)',
+      <Header />
+
+      <main style={{
+        flex: 1,
+        width: '100%',
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '40px 20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '40px'
       }}>
-        <div className="container" style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-          {children}
-        </div>
-      </div>
+        {children}
+      </main>
+
+      <Footer />
     </div>
   )
 }

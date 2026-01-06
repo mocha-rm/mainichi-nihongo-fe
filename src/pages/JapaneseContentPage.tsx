@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 
 interface ContentData {
   date: string;
@@ -48,37 +46,6 @@ const JapaneseContentPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
-
-  // Glass Mixin
-  const glassStyle = {
-    background: 'rgba(255, 255, 255, 0.65)',
-    backdropFilter: 'blur(20px)',
-    WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255, 255, 255, 0.4)',
-    borderRadius: '24px',
-    boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-    padding: '40px',
-    marginBottom: '40px'
-  };
-
-  const navBtnStyle = (disabled: boolean) => ({
-    background: disabled ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.4)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(255, 255, 255, 0.2)',
-    borderRadius: '16px',
-    padding: '15px 25px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    opacity: disabled ? 0.5 : 1,
-    color: '#2d3436',
-    fontWeight: 600,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '10px',
-    transition: 'all 0.2s',
-    flex: 1,
-    justifyContent: 'center',
-    boxShadow: disabled ? 'none' : '0 4px 15px rgba(0,0,0,0.05)'
-  });
 
   const prevDate = date ? getPreviousDate(date) : null;
   const nextDate = date ? getNextDate(date) : null;
@@ -165,16 +132,22 @@ const JapaneseContentPage: React.FC = () => {
 
   return (
     <>
-      <Header title="오늘의 일본어" showTags={false} />
+      {/* Hero Section */}
+      <div className="text-center" style={{ marginBottom: '30px' }}>
+        <h2 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '10px' }}>
+          📖 오늘의 일본어
+        </h2>
+      </div>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      {/* 통합 카드 */}
+      <div className="glass-panel" style={{ padding: '50px', maxWidth: '900px', margin: '0 auto' }}>
 
-        {/* Info Card - Glass */}
+        {/* Info Card */}
         <div style={{
-          ...glassStyle,
           padding: '20px',
-          marginBottom: '30px',
-          background: 'rgba(255, 255, 255, 0.4)',
+          marginBottom: '40px',
+          background: 'rgba(108, 92, 231, 0.03)',
+          borderRadius: '16px',
           textAlign: 'center',
           display: 'flex',
           justifyContent: 'center',
@@ -186,24 +159,53 @@ const JapaneseContentPage: React.FC = () => {
           <span style={{ fontSize: '1.1rem', color: '#e84393' }}>🎯 <strong>{data.topic}</strong> 주제</span>
         </div>
 
-        {/* Main Content - High Readability Glass */}
-        <div className="main-content" style={{
-          ...glassStyle,
+        {/* 구분선 */}
+        <div style={{
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, rgba(108, 92, 231, 0.2), transparent)',
+          margin: '40px 0'
+        }} />
+
+        {/* Main Content */}
+        <div style={{
           lineHeight: 1.8,
           fontSize: '1.1rem',
-          color: '#2d3436'
+          color: '#2d3436',
+          marginBottom: '40px'
         }}>
           <div dangerouslySetInnerHTML={{ __html: data.content }} className="lesson-content" />
         </div>
 
+        {/* 구분선 */}
+        <div style={{
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, rgba(108, 92, 231, 0.2), transparent)',
+          margin: '40px 0'
+        }} />
+
         {/* 네비게이션 버튼 */}
-        <div className="content-navigation" style={{ display: 'flex', gap: '20px', marginBottom: '60px' }}>
+        <div style={{ display: 'flex', gap: '20px' }}>
           <button
             onClick={handlePrevClick}
             disabled={!prevDate}
-            style={navBtnStyle(!prevDate)}
-            onMouseEnter={(e) => !(!prevDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.6)')}
-            onMouseLeave={(e) => !(!prevDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.4)')}
+            style={{
+              flex: 1,
+              padding: '15px 25px',
+              borderRadius: '16px',
+              border: 'none',
+              background: prevDate ? 'rgba(108, 92, 231, 0.1)' : 'rgba(200, 200, 200, 0.1)',
+              color: prevDate ? '#6c5ce7' : '#999',
+              fontWeight: 600,
+              cursor: prevDate ? 'pointer' : 'not-allowed',
+              opacity: prevDate ? 1 : 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => prevDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
+            onMouseLeave={(e) => prevDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
           >
             <span>◀</span>
             <span>이전 글</span>
@@ -212,18 +214,30 @@ const JapaneseContentPage: React.FC = () => {
           <button
             onClick={handleNextClick}
             disabled={!nextDate}
-            style={navBtnStyle(!nextDate)}
-            onMouseEnter={(e) => !(!nextDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.6)')}
-            onMouseLeave={(e) => !(!nextDate) && (e.currentTarget.style.background = 'rgba(255,255,255,0.4)')}
+            style={{
+              flex: 1,
+              padding: '15px 25px',
+              borderRadius: '16px',
+              border: 'none',
+              background: nextDate ? 'rgba(108, 92, 231, 0.1)' : 'rgba(200, 200, 200, 0.1)',
+              color: nextDate ? '#6c5ce7' : '#999',
+              fontWeight: 600,
+              cursor: nextDate ? 'pointer' : 'not-allowed',
+              opacity: nextDate ? 1 : 0.5,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => nextDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
+            onMouseLeave={(e) => nextDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
           >
             <span>다음 글</span>
             <span>▶</span>
           </button>
         </div>
-
       </div>
-
-      <Footer />
 
       <style>{`
         .lesson-content h2 {

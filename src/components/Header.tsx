@@ -1,67 +1,72 @@
+/* src/components/Header.tsx */
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'
 
-interface HeaderProps {
-  title?: string
-  subtitle?: string
-  showTags?: boolean
-}
-
-const Header: React.FC<HeaderProps> = ({ title = "마이니치 니홍고", showTags = false }) => {
+const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const menuItems = [
+    { label: '홈', path: '/' },
+    { label: '학습 콘텐츠', path: '/contents' },
+    { label: '구독 관리', path: '/unsubscribe' },
+  ];
 
   return (
-    <header style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '20px 40px',
-      marginTop: '20px',
-      marginBottom: '40px',
-      borderRadius: '24px',
-      background: 'rgba(255, 255, 255, 0.25)',
-      boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.1)',
-      backdropFilter: 'blur(8px)',
-      WebkitBackdropFilter: 'blur(8px)',
-      border: '1px solid rgba(255, 255, 255, 0.18)',
-    }}>
-      <div
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}
-      >
-        <div style={{
-          width: '40px', height: '40px', borderRadius: '12px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: 'white', fontWeight: 'bold', fontSize: '20px'
-        }}>
-          日
+    <header className="glass-header" style={{ padding: '15px 0' }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 20px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        {/* 로고 영역 */}
+        <div
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
+        >
+          <div style={{
+            width: '40px', height: '40px', borderRadius: '12px',
+            background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'white', fontWeight: 'bold', fontSize: '20px',
+            boxShadow: '0 4px 10px rgba(108, 92, 231, 0.3)'
+          }}>
+            日
+          </div>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, color: '#2d3436' }}>
+            마이니치 니홍고
+          </h1>
         </div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, color: '#2d3436', fontFamily: "'Gaegu', cursive" }}>
-          {title}
-        </h1>
-      </div>
 
-      <nav style={{ display: 'flex', gap: '30px' }}>
-        {['홈', '콘텐츠 목록'].map((item) => (
-          <span
-            key={item}
-            onClick={() => navigate(item === '홈' ? '/' : '/contents')}
-            style={{
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: '#2d3436',
-              opacity: 0.8,
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.8'}
-          >
-            {item}
-          </span>
-        ))}
-      </nav>
+        {/* 네비게이션 메뉴 */}
+        <nav style={{ display: 'flex', gap: '10px' }}>
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                style={{
+                  background: isActive ? 'rgba(108, 92, 231, 0.1)' : 'transparent',
+                  color: isActive ? '#6c5ce7' : '#636e72',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontWeight: isActive ? 700 : 500,
+                  fontSize: '0.95rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                {item.label}
+              </button>
+            )
+          })}
+        </nav>
+      </div>
     </header>
   )
 }
