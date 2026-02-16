@@ -24,7 +24,7 @@ export interface ApiResponse {
 export const subscribe = async (email: string): Promise<string> => {
   try {
     const response = await api.post<ApiResponse>('/api/subscribe', { email })
-    return response.data || '구독이 완료되었습니다!'
+    return response.data.message || '구독이 완료되었습니다!'
   } catch (error) {
     if (error instanceof Error) {
       throw error
@@ -41,7 +41,7 @@ export const subscribe = async (email: string): Promise<string> => {
 export const unsubscribe = async (email: string): Promise<string> => {
   try {
     const response = await api.post<ApiResponse>('/api/unsubscribe', { email })
-    return response.data || '구독이 취소되었습니다.'
+    return response.data.message || '구독이 취소되었습니다.'
   } catch (error) {
     if (error instanceof Error) {
       throw error
