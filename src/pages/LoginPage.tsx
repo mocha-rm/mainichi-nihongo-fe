@@ -58,22 +58,17 @@ const LoginPage: React.FC = () => {
                 textAlign: 'center'
             }}>
                 {/* 로고 */}
-                <div style={{
-                    width: '64px',
-                    height: '64px',
-                    borderRadius: '16px',
-                    background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    fontSize: '28px',
-                    margin: '0 auto 24px',
-                    boxShadow: '0 8px 20px rgba(108, 92, 231, 0.3)'
-                }}>
-                    日
-                </div>
+                <img
+                    src="/favicon.ico"
+                    alt="마이니치 니홍고"
+                    style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '16px',
+                        margin: '0 auto 24px',
+                        objectFit: 'contain'
+                    }}
+                />
 
                 <h1 style={{
                     fontSize: '1.8rem',
