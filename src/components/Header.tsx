@@ -34,15 +34,14 @@ const Header: React.FC = () => {
           onClick={() => navigate('/')}
           style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '12px' }}
         >
-          <div style={{
-            width: '40px', height: '40px', borderRadius: '12px',
-            background: 'linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', fontWeight: 'bold', fontSize: '20px',
-            boxShadow: '0 4px 10px rgba(108, 92, 231, 0.3)'
-          }}>
-            日
-          </div>
+          <img
+            src="/favicon.ico"
+            alt="마이니치 니홍고"
+            style={{
+              width: '40px', height: '40px', borderRadius: '12px',
+              objectFit: 'contain'
+            }}
+          />
           <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0, color: '#2d3436' }}>
             마이니치 니홍고
           </h1>
