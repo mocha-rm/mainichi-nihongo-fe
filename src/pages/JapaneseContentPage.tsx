@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../utils/api';
 
 interface ContentData {
   date: string;
@@ -70,7 +70,7 @@ const JapaneseContentPage: React.FC = () => {
       return;
     }
 
-    axios
+    api
       .get(`/api/contents/${date}`, {
         headers: { Accept: 'text/html' },
         responseType: 'text',
