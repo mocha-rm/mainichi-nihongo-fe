@@ -9,58 +9,51 @@ interface ContentData {
   content: string;
 }
 
-// 날짜 유틸리티 함수들
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}${month}${day}`;
-};
-
-const parseDate = (dateString: string): Date | null => {
-  if (dateString.length !== 8) return null;
-  const year = parseInt(dateString.substring(0, 4), 10);
-  const month = parseInt(dateString.substring(4, 6), 10) - 1;
-  const day = parseInt(dateString.substring(6, 8), 10);
-  const date = new Date(year, month, day);
-  if (isNaN(date.getTime())) return null;
-  return date;
-};
-
-const getPreviousDate = (dateString: string): string | null => {
-  const date = parseDate(dateString);
-  if (!date) return null;
-  date.setDate(date.getDate() - 1);
-  return formatDate(date);
-};
-
-const getNextDate = (dateString: string): string | null => {
-  const date = parseDate(dateString);
-  if (!date) return null;
-  date.setDate(date.getDate() + 1);
-  return formatDate(date);
-};
-
 const JapaneseContentPage: React.FC = () => {
   const [data, setData] = useState<ContentData | null>(null);
   const [error, setError] = useState<string>('');
+  const [navLoading, setNavLoading] = useState<boolean>(false);
+  const [showToast, setShowToast] = useState<boolean>(false);
   const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
 
-  const prevDate = date ? getPreviousDate(date) : null;
-  const nextDate = date ? getNextDate(date) : null;
-
-  const handlePrevClick = () => {
-    if (prevDate) {
-      window.scrollTo(0, 0);
-      navigate(`/contents/${prevDate}`);
+  const handlePrevClick = async () => {
+    if (!date || navLoading) return;
+    setNavLoading(true);
+    try {
+      const res = await api.get<{ date: string }>(`/api/contents/${date}/prev`, {
+        validateStatus: (status) => status === 200 || status === 404
+      });
+      if (res.status === 200) {
+        window.scrollTo(0, 0);
+        navigate(`/contents/${res.data.date}`);
+      }
+      // 404이면 이전 콘텐츠 없음 — 아무 동작 안 함
+    } catch {
+      // 네트워크 에러 등
+    } finally {
+      setNavLoading(false);
     }
   };
 
-  const handleNextClick = () => {
-    if (nextDate) {
-      window.scrollTo(0, 0);
-      navigate(`/contents/${nextDate}`);
+  const handleNextClick = async () => {
+    if (!date || navLoading) return;
+    setNavLoading(true);
+    try {
+      const res = await api.get<{ date: string }>(`/api/contents/${date}/next`, {
+        validateStatus: (status) => status === 200 || status === 404
+      });
+      if (res.status === 200) {
+        window.scrollTo(0, 0);
+        navigate(`/contents/${res.data.date}`);
+      } else if (res.status === 404) {
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 2500);
+      }
+    } catch {
+      // 네트워크 에러 등
+    } finally {
+      setNavLoading(false);
     }
   };
 
@@ -132,6 +125,27 @@ const JapaneseContentPage: React.FC = () => {
 
   return (
     <>
+      {/* Toast 알림 */}
+      {showToast && (
+        <div style={{
+          position: 'fixed',
+          top: '30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'rgba(108, 92, 231, 0.95)',
+          color: '#fff',
+          padding: '14px 32px',
+          borderRadius: '12px',
+          fontSize: '1rem',
+          fontWeight: 600,
+          boxShadow: '0 8px 32px rgba(108, 92, 231, 0.3)',
+          zIndex: 9999,
+          animation: 'toastFadeIn 0.3s ease-out'
+        }}>
+          📌 최신 게시글입니다
+        </div>
+      )}
+
       {/* Hero Section */}
       <div className="text-center" style={{ marginBottom: '30px' }}>
         <h2 className="text-gradient" style={{ fontSize: '2.5rem', marginBottom: '10px' }}>
@@ -187,25 +201,25 @@ const JapaneseContentPage: React.FC = () => {
         <div style={{ display: 'flex', gap: '20px' }}>
           <button
             onClick={handlePrevClick}
-            disabled={!prevDate}
+            disabled={navLoading}
             style={{
               flex: 1,
               padding: '15px 25px',
               borderRadius: '16px',
               border: 'none',
-              background: prevDate ? 'rgba(108, 92, 231, 0.1)' : 'rgba(200, 200, 200, 0.1)',
-              color: prevDate ? '#6c5ce7' : '#999',
+              background: 'rgba(108, 92, 231, 0.1)',
+              color: '#6c5ce7',
               fontWeight: 600,
-              cursor: prevDate ? 'pointer' : 'not-allowed',
-              opacity: prevDate ? 1 : 0.5,
+              cursor: navLoading ? 'wait' : 'pointer',
+              opacity: navLoading ? 0.6 : 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '10px',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => prevDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
-            onMouseLeave={(e) => prevDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
+            onMouseEnter={(e) => !navLoading && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
+            onMouseLeave={(e) => !navLoading && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
           >
             <span>◀</span>
             <span>이전 글</span>
@@ -213,25 +227,25 @@ const JapaneseContentPage: React.FC = () => {
 
           <button
             onClick={handleNextClick}
-            disabled={!nextDate}
+            disabled={navLoading}
             style={{
               flex: 1,
               padding: '15px 25px',
               borderRadius: '16px',
               border: 'none',
-              background: nextDate ? 'rgba(108, 92, 231, 0.1)' : 'rgba(200, 200, 200, 0.1)',
-              color: nextDate ? '#6c5ce7' : '#999',
+              background: 'rgba(108, 92, 231, 0.1)',
+              color: '#6c5ce7',
               fontWeight: 600,
-              cursor: nextDate ? 'pointer' : 'not-allowed',
-              opacity: nextDate ? 1 : 0.5,
+              cursor: navLoading ? 'wait' : 'pointer',
+              opacity: navLoading ? 0.6 : 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '10px',
               transition: 'all 0.2s'
             }}
-            onMouseEnter={(e) => nextDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
-            onMouseLeave={(e) => nextDate && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
+            onMouseEnter={(e) => !navLoading && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.15)')}
+            onMouseLeave={(e) => !navLoading && (e.currentTarget.style.background = 'rgba(108, 92, 231, 0.1)')}
           >
             <span>다음 글</span>
             <span>▶</span>
@@ -266,7 +280,12 @@ const JapaneseContentPage: React.FC = () => {
             padding: 2px 5px;
             border-radius: 4px;
         }
-      `}</style>
+        @keyframes toastFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}
+      </style>
     </>
   );
 };
